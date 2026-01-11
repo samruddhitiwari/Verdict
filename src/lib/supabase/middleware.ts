@@ -2,10 +2,16 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Public routes that don't need Supabase session handling
-const publicRoutes = ['/', '/auth']
+const publicRoutes = ['/', '/auth', '/validate']
 
 export async function updateSession(request: NextRequest) {
     const pathname = request.nextUrl.pathname
+
+    // Early exit if env vars are missing - prevents crashes
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.warn('Supabase environment variables not configured')
+        return NextResponse.next({ request })
+    }
 
     // Skip Supabase handling for public routes - just pass through
     const isPublicRoute = publicRoutes.some(route =>
