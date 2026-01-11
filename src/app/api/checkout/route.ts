@@ -44,7 +44,8 @@ export async function POST(request: Request) {
             .single()
 
         if (paymentError) {
-            return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 })
+            console.error('Payment insert error:', paymentError)
+            return NextResponse.json({ error: `Failed to create payment: ${paymentError.message}` }, { status: 500 })
         }
 
         // TODO: Integrate with actual Dodo Payments API

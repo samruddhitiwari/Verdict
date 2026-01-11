@@ -21,14 +21,23 @@ export function UnlockButton({ validationId }: UnlockButtonProps) {
 
             const data = await response.json()
 
+            if (!response.ok) {
+                console.error('Checkout API error:', data)
+                alert(`Payment error: ${data.error || 'Unknown error'}`)
+                setLoading(false)
+                return
+            }
+
             if (data.checkoutUrl) {
                 window.location.href = data.checkoutUrl
             } else {
-                console.error('No checkout URL received')
+                console.error('No checkout URL received:', data)
+                alert('Failed to create checkout session. Please try again.')
                 setLoading(false)
             }
         } catch (error) {
             console.error('Checkout error:', error)
+            alert('Network error. Please check your connection and try again.')
             setLoading(false)
         }
     }

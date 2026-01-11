@@ -15,28 +15,37 @@ export async function GET(request: Request) {
 
     const supabase = await createClient()
 
-    // Update payment status
-    await supabase
-        .from('payments')
-        .update({ status: 'success' })
-        .eq('id', paymentId)
-
-    // Mark validation as paid
-    await supabase
-        .from('validations')
-        .update({
-            is_paid: true,
-            payment_id: paymentId
-        })
-        .eq('id', validationId)
-
-    // Trigger AI analysis
     try {
-        await analyzeIdea(validationId)
+        // Update payment status
+        await supabase
+            .from('payments')
+            .update({ status: 'success' })
+            .eq('id', paymentId)
+
+        // Mark validation as paid
+        await supabase
+            .from('validations')
+            .update({
+                is_paid: true,
+                payment_id: paymentId
+            })
+            .eq('id', validationId)
     } catch (error) {
-        console.error('AI analysis error:', error)
-        // Continue anyway - user can see pending state
+        console.error('Database update error:', error)
+        // Continue to redirect even if DB update fails
     }
+
+    // Trigger AI analysis in background (don't await - let it run async)
+    // Using Promise.race with a timeout to not block the redirect
+    const aiPromise = analyzeIdea(validationId).catch(error => {
+        console.error('AI analysis error (background):', error)
+    })
+
+    // Give AI a small head start but don't wait for it to complete
+    await Promise.race([
+        aiPromise,
+        new Promise(resolve => setTimeout(resolve, 500)) // 500ms max wait
+    ])
 
     redirect(`/results/${validationId}`)
 }
