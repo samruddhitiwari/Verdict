@@ -56,10 +56,10 @@ export function UnlockButton({ validationId }: UnlockButtonProps) {
                 'PROCESSING...'
             ) : (
                 <>
-                    UNLOCK FINAL JUDGMENT — $4
+                    SUBSCRIBE — $7/mo
                     <br />
                     <span className="text-dim" style={{ fontSize: '0.75rem', fontWeight: 400 }}>
-                        One-time · Permanent · No retries
+                        Unlimited verdicts · Cancel anytime
                     </span>
                 </>
             )}

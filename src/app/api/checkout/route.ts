@@ -36,7 +36,7 @@ export async function POST(request: Request) {
             .insert({
                 user_id: user.id,
                 validation_id: validationId,
-                amount: 4,
+                amount: 7,
                 currency: 'USD',
                 status: 'pending',
             })

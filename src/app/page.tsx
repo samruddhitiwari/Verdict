@@ -51,7 +51,7 @@ export default function HomePage() {
                 className="btn btn-primary"
                 style={{ padding: 'var(--space-md) var(--space-xl)' }}
               >
-                GET A VERDICT — $4
+                START — $7/mo
               </Link>
               <button
                 onClick={() => setShowSimulation(true)}
@@ -183,13 +183,14 @@ export default function HomePage() {
               FINAL JUDGMENT
             </h2>
             <div style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 'var(--space-sm)' }}>
-              $4
+              $7/month
             </div>
             <div className="mono text-dim" style={{ fontSize: '0.875rem', marginBottom: 'var(--space-lg)' }}>
-              One-time · Permanent · No retries
+              Unlimited verdicts · Cancel anytime
             </div>
             <div className="mono text-muted" style={{ fontSize: '0.875rem', lineHeight: 2 }}>
-              <div>• One irreversible decision (SHIP / VALIDATE / KILL)</div>
+              <div>• Unlimited idea validations</div>
+              <div>• Irreversible decisions (SHIP / VALIDATE / KILL)</div>
               <div>• Internal memo-style reasoning</div>
               <div>• Red flags & required actions</div>
               <div>• Permanent record in dashboard</div>
