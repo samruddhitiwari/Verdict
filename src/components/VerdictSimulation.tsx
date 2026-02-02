@@ -310,7 +310,7 @@ export function VerdictSimulation({ isOpen, onClose }: VerdictSimulationProps) {
                             a real, irreversible judgment.
                         </p>
                         <Link href="/validate" className="btn btn-accent" style={{ marginBottom: 'var(--space-lg)' }}>
-                            GET A REAL VERDICT — $4
+                            GET A REAL VERDICT — $7
                         </Link>
                         <button
                             onClick={onClose}
