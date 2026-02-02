@@ -150,7 +150,7 @@ export function VerdictSimulation({ isOpen, onClose }: VerdictSimulationProps) {
                             PAYMENT RECEIVED
                         </div>
                         <div style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 'var(--space-md)' }}>
-                            $4 — FINAL JUDGMENT
+                            $7 — FINAL JUDGMENT
                         </div>
                         <p className="text-dim mono" style={{ fontSize: '0.75rem', marginBottom: 'var(--space-2xl)' }}>
                             Simulation only. No charge.
