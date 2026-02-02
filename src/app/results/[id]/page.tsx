@@ -6,19 +6,52 @@ import { generatePreliminarySignals } from '@/lib/prompts/judge'
 import { UnlockButton } from './UnlockButton'
 import { ExportButton } from './ExportButton'
 import { ExternalPlaybook } from '@/components/ExternalPlaybook'
+import { analyzeIdea } from '@/lib/ai/analyze'
 
 interface PageProps {
     params: Promise<{ id: string }>
+    searchParams: Promise<{ success?: string; payment_id?: string }>
 }
 
-export default async function ResultsPage({ params }: PageProps) {
+export default async function ResultsPage({ params, searchParams }: PageProps) {
     const { id } = await params
+    const { success, payment_id } = await searchParams
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
         redirect('/auth')
+    }
+
+    // Handle payment success callback from Dodo
+    if (success === 'true' && payment_id) {
+        try {
+            // Update payment status
+            await supabase
+                .from('payments')
+                .update({ status: 'success' })
+                .eq('id', payment_id)
+
+            // Mark validation as paid
+            await supabase
+                .from('validations')
+                .update({
+                    is_paid: true,
+                    payment_id: payment_id
+                })
+                .eq('id', id)
+
+            // Trigger AI analysis in background
+            analyzeIdea(id).catch(error => {
+                console.error('AI analysis error (background):', error)
+            })
+
+            // Redirect to clean URL to prevent re-processing on refresh
+            redirect(`/results/${id}`)
+        } catch (error) {
+            console.error('Payment success processing error:', error)
+        }
     }
 
     const { data: validation } = await supabase
