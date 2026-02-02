@@ -48,37 +48,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: `Failed to create payment: ${paymentError.message}` }, { status: 500 })
         }
 
-        // TODO: Integrate with actual Dodo Payments API
-        // For now, we'll create a mock checkout URL
-        // In production, this would call Dodo Payments to create a checkout session
-
-        const checkoutUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/checkout/success?payment_id=${payment.id}&validation_id=${validationId}`
-
-        /*
-        // Example Dodo Payments integration:
-        const dodoResponse = await fetch('https://api.dodopayments.com/v1/checkout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.DODO_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: 49900, // in paise
-            currency: 'INR',
-            description: 'VERDICT Final Judgment',
-            metadata: {
-              payment_id: payment.id,
-              validation_id: validationId,
-              user_id: user.id,
-            },
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/results/${validationId}?success=true`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/results/${validationId}?cancelled=true`,
-          }),
-        })
-        
-        const dodoData = await dodoResponse.json()
-        const checkoutUrl = dodoData.checkout_url
-        */
+        // Dodo Payments checkout URL with metadata for tracking
+        const successUrl = encodeURIComponent(
+            `${process.env.NEXT_PUBLIC_APP_URL}/results/${validationId}?success=true&payment_id=${payment.id}`
+        )
+        const checkoutUrl = `https://checkout.dodopayments.com/buy/pdt_0NXcI1vgswE8tiw65y91Z?quantity=1&redirect_url=${successUrl}`
 
         return NextResponse.json({ checkoutUrl })
     } catch (error) {
