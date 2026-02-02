@@ -42,6 +42,22 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
             })
             .eq('id', id)
 
+        // Create or update subscription for 30 days
+        const now = new Date()
+        const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+
+        await supabase
+            .from('subscriptions')
+            .upsert({
+                user_id: user.id,
+                status: 'active',
+                current_period_start: now.toISOString(),
+                current_period_end: thirtyDaysLater.toISOString(),
+                updated_at: now.toISOString()
+            }, {
+                onConflict: 'user_id'
+            })
+
         // Trigger AI analysis in background (don't await)
         analyzeIdea(id).catch(error => {
             console.error('AI analysis error (background):', error)
@@ -63,7 +79,39 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
     }
 
     const v = validation as Validation
-    const isPaid = v.is_paid
+
+    // Check for active subscription
+    const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .gte('current_period_end', new Date().toISOString())
+        .single()
+
+    const hasActiveSubscription = !!subscription
+
+    // If user has active subscription and validation is not yet paid, auto-unlock
+    if (hasActiveSubscription && !v.is_paid) {
+        // Mark validation as paid (subscription covers it)
+        await supabase
+            .from('validations')
+            .update({
+                is_paid: true,
+                payment_id: 'subscription'
+            })
+            .eq('id', id)
+
+        // Trigger AI analysis
+        analyzeIdea(id).catch(error => {
+            console.error('AI analysis error (background):', error)
+        })
+
+        // Redirect to refresh the page with updated state
+        redirect(`/results/${id}`)
+    }
+
+    const isPaid = v.is_paid || hasActiveSubscription
     const hasVerdict = isPaid && v.verdict !== null
 
     // Generate preliminary signals for unpaid cases
