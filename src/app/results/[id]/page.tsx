@@ -7,6 +7,7 @@ import { UnlockButton } from './UnlockButton'
 import { ExportButton } from './ExportButton'
 import { ExternalPlaybook } from '@/components/ExternalPlaybook'
 import { analyzeIdea } from '@/lib/ai/analyze'
+import { AutoRefresh } from './AutoRefresh'
 
 interface PageProps {
     params: Promise<{ id: string }>
@@ -273,16 +274,19 @@ export default async function ResultsPage({ params, searchParams }: PageProps) {
 
                 {/* Pending State - Paid but no verdict yet */}
                 {isPaid && !hasVerdict && (
-                    <div className="panel text-center" style={{ padding: 'var(--space-3xl)' }}>
-                        <div className="animate-pulse mb-lg">
-                            <span className="mono text-dim" style={{ fontSize: '0.875rem' }}>
-                                ISSUING JUDGMENT...
-                            </span>
+                    <>
+                        <AutoRefresh intervalMs={3000} />
+                        <div className="panel text-center" style={{ padding: 'var(--space-3xl)' }}>
+                            <div className="animate-pulse mb-lg">
+                                <span className="mono text-dim" style={{ fontSize: '0.875rem' }}>
+                                    ISSUING JUDGMENT...
+                                </span>
+                            </div>
+                            <p className="text-muted">
+                                Your case is being reviewed. This page will update automatically.
+                            </p>
                         </div>
-                        <p className="text-muted">
-                            Your case is being reviewed. This page will update automatically.
-                        </p>
-                    </div>
+                    </>
                 )}
             </div>
         </main>
